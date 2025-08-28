@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+  		<title>Bartender Dashboard</title>
+	</head>
+	<body style="text-align: center;">
+  		<h1>Bartender Dashboard</h1>
+  		<h2>Pending Orders</h2>
+  		<div id="pending"></div>
+		<h2>Ready for Pickup</h2>
+  		<div id="ready"></div>
+  	<script>
+    		async function loadQueue() {
+      			const res = await fetch('/bartender/queue-data');
+      			const { orders, readyOrders, menu } = await res.json();
+      			const pendingDiv = document.getElementById('pending');
+      			pendingDiv.innerHTML = orders.length ? orders.map(o => {
+            		const drink = menu.find(d => d.id === o.drink_id);
+            		return `<p>${o.customer_name} - ${drink?.name || 'Unknown'} 
+                      	<a href="/bartender/complete/${o.id}">| Mark Ready</a></p>`;
+         	}).join('') : '<p>No pending orders.</p>';
+      		const readyDiv = document.getElementById('ready');
+      		readyDiv.innerHTML = readyOrders.length ? readyOrders.map(o => {
+            		const drink = menu.find(d => d.id === o.drink_id);
+            		return `<p>${o.customer_name} - ${drink?.name || 'Unknown'} 
+                	<a href="/bartender/pickup/${o.id}">| Mark Picked Up</a></p>`; 
+		}).join('') : '<p>No drinks ready.</p>'; }
+    		loadQueue();
+  	</script>
+  		<a href="/" class="btn">← Back to Home</a>
+	</body>
+</html>
